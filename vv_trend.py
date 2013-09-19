@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+import argparse
 import numpy as np
 import matplotlib
 if __name__ == '__main__':
@@ -11,6 +13,17 @@ import matplotlib.cm as cm
 from Chandra.Time import DateTime
 
 from mica.vv import get_rms_data
+
+
+def get_options():
+    parser = argparse.ArgumentParser(
+        description="Update VV/Aspect Solution resid plots")
+    parser.add_argument("--outdir",
+                        default="/proj/sot/ska/www/ASPECT/vv_rms/",
+                        help="directory for plots")
+    opt = parser.parse_args()
+    return opt
+
 
 def mission_plots(rms_data):
     norm = mpl.colors.LogNorm()
@@ -79,12 +92,14 @@ def mission_plots(rms_data):
                 mag_vs_resid=mag_resid_fig)
 
 
-
-
-
 if __name__ == '__main__':
+    opt = get_options()
+    if not os.path.exists(opt.outdir):
+        os.makedirs(opt.outdir)
+
     rms_data = get_rms_data()
     figures = mission_plots(rms_data)
     for fig in figures:
         plt.figure(figures[fig].number)
-        plt.savefig("{}.png".format(fig))
+        plt.savefig(os.path.join(opt.outdir,
+                                 "{}.png".format(fig)))
