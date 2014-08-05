@@ -38,7 +38,7 @@ def mission_plots(rms_data):
     H, xedges, yedges = np.histogram2d(
         DateTime(data[notfid & reasonable]['tstart']).frac_year,
         data[notfid & reasonable]['dz_rms'],
-        bins=100, range=[[2007, DateTime().frac_year + .25], [0.02, 0.30]])
+        bins=100, range=[[2007, DateTime().frac_year + .25], [0.0, 0.30]])
     #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
     ax1 = hist2d_fig.add_axes([0.14, 0.12, 0.70, 0.78])
     #ax1 = subplot(111)
