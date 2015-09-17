@@ -40,16 +40,17 @@ def mission_plots(rms_data):
         data[notfid & reasonable]['dz_rms'],
         bins=100, range=[[2007, DateTime().frac_year + .25], [0.0, 0.30]])
     #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
-    ax1 = hist2d_fig.add_axes([0.14, 0.12, 0.70, 0.78])
+    ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
     #ax1 = subplot(111)
     ax1.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
     plt.grid()
     plt.ylabel("Star Resid RMS in Z (arcsec)")
     plt.xlabel("Time (Cal Year)")
     plt.suptitle("RMS vs Time")
+    plt.xticks(rotation='60')
     ax1.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%d'))
 
-    ax2 = hist2d_fig.add_axes([0.85, 0.12, 0.015, 0.78])
+    ax2 = hist2d_fig.add_axes([0.85, 0.14, 0.015, 0.78])
     tick_locs = [norm.vmin, 2, 5, 10, norm.vmax]
     cb = mpl.colorbar.ColorbarBase(ax2,
                                    cmap=my_cm,
