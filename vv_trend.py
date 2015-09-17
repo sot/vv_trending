@@ -99,6 +99,8 @@ if __name__ == '__main__':
         os.makedirs(opt.outdir)
 
     rms_data = get_rms_data()
+    # Filter in place to only use default data in plots
+    rms_data = rms_data[rms_data['isdefault'] == 1]
     figures = mission_plots(rms_data)
     for fig in figures:
         plt.figure(figures[fig].number)
