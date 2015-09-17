@@ -30,14 +30,13 @@ def mission_plots(rms_data):
     my_cm = cm.jet
     figsize = (5, 4)
     data = rms_data
-    notfid = data['type'] != 'FID'
     reasonable = ((data['dz_rms'] > 0) & (data['dz_rms'] < 1))
     last_year = data['tstart'] > DateTime(-365).secs
 
     hist2d_fig = plt.figure(figsize=figsize)
     H, xedges, yedges = np.histogram2d(
-        DateTime(data[notfid & reasonable]['tstart']).frac_year,
-        data[notfid & reasonable]['dz_rms'],
+        DateTime(data[reasonable]['tstart']).frac_year,
+        data[reasonable]['dz_rms'],
         bins=100, range=[[2007, DateTime().frac_year + .25], [0.0, 0.30]])
     #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
     ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
@@ -75,11 +74,11 @@ def mission_plots(rms_data):
     norm_blue = matplotlib.colors.BoundaryNorm(bounds, cmap_blue.N, 256)
     norm_red = matplotlib.colors.BoundaryNorm(bounds, cmap_red.N, 256)
     ax2 = mag_resid_fig.add_axes([0.14, 0.12, 0.70, 0.78])
-    h2, x2, y2 = np.histogram2d(data[notfid & reasonable & year_2007]['mag_med'],
-                                data[notfid & reasonable & year_2007]['dz_rms'], 
+    h2, x2, y2 = np.histogram2d(data[reasonable & year_2007]['mag_med'],
+                                data[reasonable & year_2007]['dz_rms'],
                                 bins=100, range=[[5,11], [0, .3]])
-    h1, x1, y1 = np.histogram2d(data[notfid & reasonable & last_year]['mag_med'], 
-                                data[notfid & reasonable & last_year]['dz_rms'],
+    h1, x1, y1 = np.histogram2d(data[reasonable & last_year]['mag_med'],
+                                data[reasonable & last_year]['dz_rms'],
                                 bins=100, range=[[5,11], [0, .3]])
     ax2.pcolorfast(x2, y2, h2.T, cmap=cmap_blue, norm=norm_blue)
     ax2.pcolorfast(x1, y1, h1.T, cmap=cmap_red, norm=norm_red)
@@ -101,6 +100,9 @@ if __name__ == '__main__':
     rms_data = get_rms_data()
     # Filter in place to only use default data in plots
     rms_data = rms_data[rms_data['isdefault'] == 1]
+    # And filter to only plot "used" star slots
+    rms_data = rms_data[(rms_data['used'] == 1)
+                        & (rms_data['type'] != 'FID')]
     figures = mission_plots(rms_data)
     for fig in figures:
         plt.figure(figures[fig].number)
