@@ -9,9 +9,11 @@ if __name__ == '__main__':
 import matplotlib.pyplot as plt
 import matplotlib.mpl as mpl
 import matplotlib.cm as cm
+from astropy.table import Table
 
 from Chandra.Time import DateTime
 
+from mica.archive.aca_dark import get_warm_fracs
 from mica.vv import get_rms_data
 
 
@@ -87,8 +89,30 @@ def mission_plots(rms_data):
     plt.xlabel("Median Mag.")
     plt.ylabel("Star Resid RMS in Z (arcsec)")
 
+    # plot rms vs warm fraction
+    hist2d_fig_n100 = plt.figure(figsize=figsize)
+    H, xedges, yedges = np.histogram2d(
+        data[reasonable]['n100_frac'],
+        data[reasonable]['dz_rms'],
+        bins=100, range=[[0.01, 0.22], [0.0, 0.35]])
+    ax1n = hist2d_fig_n100.add_axes([0.14, 0.14, 0.70, 0.78])
+    ax1n.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
+    plt.grid()
+    plt.ylabel("Star Resid RMS in Z (arcsec)")
+    plt.xlabel("N100 frac")
+    plt.suptitle("RMS vs N100 frac")
+    ax2n = hist2d_fig_n100.add_axes([0.85, 0.14, 0.015, 0.78])
+    cbn = mpl.colorbar.ColorbarBase(ax2n,
+                                    cmap=my_cm,
+                                    norm=norm,
+                                    orientation='vertical')
+    cbn.locator = mpl.ticker.FixedLocator(tick_locs)
+    cbn.formatter = mpl.ticker.FormatStrFormatter("%d")
+    plt.ylabel("N stars")
+    cbn.update_ticks()
 
     return dict(hist2d_fig=hist2d_fig,
+                hist2d_fig_n100=hist2d_fig_n100,
                 mag_vs_resid=mag_resid_fig)
 
 
@@ -103,6 +127,16 @@ if __name__ == '__main__':
     # And filter to only plot "used" star slots
     rms_data = rms_data[(rms_data['used'] == 1)
                         & (rms_data['type'] != 'FID')]
+    # Lookup the n100 warm fraction for each slot
+    # This doesn't take long enough to be worth optimizing (to do the lookups via obsid
+    # or save out the values to another table or the like)
+    warm_frac = []
+    for slot in rms_data:
+        frac = get_warm_fracs(100, slot['tstart'], slot['mean_aacccdpt'])
+        warm_frac.append(frac)
+    rms_data = Table(rms_data)
+    rms_data['n100_frac'] = np.array(warm_frac)
+
     figures = mission_plots(rms_data)
     for fig in figures:
         plt.figure(figures[fig].number)
