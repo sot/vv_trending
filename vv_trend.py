@@ -7,7 +7,7 @@ import matplotlib
 if __name__ == '__main__':
     matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.mpl as mpl
+import matplotlib as mpl
 import matplotlib.cm as cm
 from astropy.table import Table
 
