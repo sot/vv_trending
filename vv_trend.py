@@ -94,7 +94,7 @@ def mission_plots(rms_data):
     H, xedges, yedges = np.histogram2d(
         data[reasonable]['n100_frac'],
         data[reasonable]['dz_rms'],
-        bins=100, range=[[0.01, 0.22], [0.0, 0.35]])
+        bins=100, range=[[0.01, np.max(data[reasonable]['n100_frac'])], [0.0, 0.35]])
     ax1n = hist2d_fig_n100.add_axes([0.14, 0.14, 0.70, 0.78])
     ax1n.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
     plt.grid()
