@@ -30,7 +30,7 @@ def get_options():
 def mission_plots(rms_data):
     norm = mpl.colors.LogNorm()
     my_cm = cm.jet
-    figsize = (5, 4)
+    figsize = (6, 4)
     data = rms_data
     reasonable = ((data['dz_rms'] > 0) & (data['dz_rms'] < 1))
     last_year = data['tstart'] > DateTime(-365).secs
@@ -39,12 +39,20 @@ def mission_plots(rms_data):
     H, xedges, yedges = np.histogram2d(
         DateTime(data[reasonable]['tstart']).frac_year,
         data[reasonable]['dz_rms'],
-        bins=100, range=[[2007, DateTime().frac_year + .25], [0.0, 0.30]])
+        bins=100, range=[[2007, DateTime().frac_year + .25], [0, 0.35]])
     #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
     ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
     #ax1 = subplot(111)
     ax1.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
     plt.grid()
+    plt.ylim(-0.04, 0.35)
+    plt.vlines(DateTime('2018:292').frac_year, -0.04, 0.35)
+    plt.annotate('Mixed IRU', (DateTime('2018:292').frac_year - .35, 0.025), rotation=90,
+                 fontsize=8)
+    plt.vlines(DateTime('2020:213').frac_year, -0.04, 0.35)
+    plt.annotate('Single IRU', (DateTime('2020:213').frac_year - .35, 0.025), rotation=90,
+                 fontsize=8)
+
     plt.ylabel("Star Resid RMS in Z (arcsec)")
     plt.xlabel("Time (Cal Year)")
     plt.suptitle("RMS vs Time")
@@ -97,6 +105,7 @@ def mission_plots(rms_data):
         bins=100, range=[[0.01, np.max(data[reasonable]['n100_frac'])], [0.0, 0.35]])
     ax1n = hist2d_fig_n100.add_axes([0.14, 0.14, 0.70, 0.78])
     ax1n.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
+    plt.ylim(-0.04, 0.35)
     plt.grid()
     plt.ylabel("Star Resid RMS in Z (arcsec)")
     plt.xlabel("N100 frac")
