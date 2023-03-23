@@ -13,7 +13,7 @@ from astropy.table import Table
 
 from Chandra.Time import DateTime
 
-from mica.archive.aca_dark import get_warm_fracs
+from chandra_aca.dark_model import get_warm_fracs
 from mica.vv import get_rms_data
 
 
@@ -21,7 +21,7 @@ def get_options():
     parser = argparse.ArgumentParser(
         description="Update VV/Aspect Solution resid plots")
     parser.add_argument("--outdir",
-                        default="/proj/sot/ska/www/ASPECT/vv_rms/",
+                        default=".",
                         help="directory for plots")
     opt = parser.parse_args()
     return opt
@@ -34,42 +34,8 @@ def mission_plots(rms_data):
     data = rms_data
     reasonable = ((data['dz_rms'] > 0) & (data['dz_rms'] < 1))
     last_year = data['tstart'] > DateTime(-365).secs
-
-    hist2d_fig = plt.figure(figsize=figsize)
-    H, xedges, yedges = np.histogram2d(
-        DateTime(data[reasonable]['tstart']).frac_year,
-        data[reasonable]['dz_rms'],
-        bins=100, range=[[2007, DateTime().frac_year + .25], [0, 0.35]])
-    #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
-    ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
-    #ax1 = subplot(111)
-    ax1.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
-    plt.grid()
-    plt.ylim(-0.04, 0.35)
-    plt.vlines(DateTime('2018:292').frac_year, -0.04, 0.35)
-    plt.annotate('Mixed IRU', (DateTime('2018:292').frac_year - .35, 0.025), rotation=90,
-                 fontsize=8)
-    plt.vlines(DateTime('2020:213').frac_year, -0.04, 0.35)
-    plt.annotate('Single IRU', (DateTime('2020:213').frac_year - .35, 0.025), rotation=90,
-                 fontsize=8)
-
-    plt.ylabel("Star Resid RMS in Z (arcsec)")
-    plt.xlabel("Time (Cal Year)")
-    plt.suptitle("RMS vs Time")
-    plt.xticks(rotation='60')
-    ax1.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%d'))
-
-    ax2 = hist2d_fig.add_axes([0.85, 0.14, 0.015, 0.78])
-    tick_locs = [norm.vmin, 2, 5, 10, norm.vmax]
-    cb = mpl.colorbar.ColorbarBase(ax2,
-                                   cmap=my_cm,
-                                   norm=norm,
-                                   orientation='vertical')
-    cb.locator = mpl.ticker.FixedLocator(tick_locs)
-    cb.formatter = mpl.ticker.FormatStrFormatter("%d")
-    plt.ylabel("N stars")
-    cb.update_ticks()
-
+    since_2014 = data['tstart'] > DateTime('2014:001').secs
+    
     mag_resid_fig = plt.figure(figsize=figsize)
     year_2007 = ((data['tstart'] < DateTime('2008:001').secs)
                  & (data['tstart'] > DateTime('2007:001').secs))
@@ -97,11 +63,51 @@ def mission_plots(rms_data):
     plt.xlabel("Median Mag.")
     plt.ylabel("Star Resid RMS in Z (arcsec)")
 
+
+    hist2d_fig = plt.figure(figsize=figsize)
+    H, xedges, yedges = np.histogram2d(
+        DateTime(data[reasonable & since_2014]['tstart']).frac_year,
+        data[reasonable & since_2014]['dz_rms'],
+        bins=150, range=[[2014, DateTime().frac_year + .25], [0, 0.35]])
+    #ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
+    ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
+    #ax1 = subplot(111)
+    ax1.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
+    plt.grid()
+    plt.ylim(-0.045, 0.35)
+    plt.vlines(DateTime('2018:292').frac_year, -0.045, 0.35)
+    plt.annotate('Mixed IRU', (DateTime('2018:292').frac_year - .35, -0.04), rotation=90,
+                 fontsize=10)
+    plt.vlines(DateTime('2020:213').frac_year, -0.045, 0.35)
+    plt.annotate('Single IRU', (DateTime('2020:213').frac_year - .35, -0.04), rotation=90,
+                 fontsize=10)
+    smode_date = DateTime('2023:044').frac_year
+    plt.vlines(smode_date, -0.045, 0.35)
+    plt.annotate('Safe Mode', (smode_date - .35, -0.04), rotation=90, fontsize=10)
+
+    plt.ylabel("Star Resid RMS in Z (arcsec)")
+    plt.xlabel("Time (Cal Year)")
+    plt.suptitle("RMS vs Time")
+    plt.xticks(rotation=60)
+    ax1.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%d'))
+
+    ax2 = hist2d_fig.add_axes([0.85, 0.14, 0.015, 0.78])
+    tick_locs = [norm.vmin, 2, 5, 10, norm.vmax]
+    cb = mpl.colorbar.ColorbarBase(ax2,
+                                   cmap=my_cm,
+                                   norm=norm,
+                                   orientation='vertical')
+    cb.locator = mpl.ticker.FixedLocator(tick_locs)
+    cb.formatter = mpl.ticker.FormatStrFormatter("%d")
+    plt.ylabel("N stars")
+    cb.update_ticks()
+
+
     # plot rms vs warm fraction
     hist2d_fig_n100 = plt.figure(figsize=figsize)
     H, xedges, yedges = np.histogram2d(
-        data[reasonable]['n100_frac'],
-        data[reasonable]['dz_rms'],
+        data[reasonable & since_2014]['n100_frac'],
+        data[reasonable & since_2014]['dz_rms'],
         bins=100, range=[[0.01, np.max(data[reasonable]['n100_frac'])], [0.0, 0.35]])
     ax1n = hist2d_fig_n100.add_axes([0.14, 0.14, 0.70, 0.78])
     ax1n.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
@@ -130,12 +136,13 @@ if __name__ == '__main__':
     if not os.path.exists(opt.outdir):
         os.makedirs(opt.outdir)
 
-    rms_data = get_rms_data()
+    rms_data = Table(get_rms_data())
     # Filter in place to only use default data in plots
     rms_data = rms_data[rms_data['isdefault'] == 1]
     # And filter to only plot "used" star slots
     rms_data = rms_data[(rms_data['used'] == 1)
                         & (rms_data['type'] != 'FID')]
+
     # Lookup the n100 warm fraction for each slot
     # This doesn't take long enough to be worth optimizing (to do the lookups via obsid
     # or save out the values to another table or the like)
