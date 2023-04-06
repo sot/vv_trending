@@ -89,7 +89,6 @@ def mission_plots(rms_data):
     plt.annotate('Safe Mode', (smode_date - .175, -0.04), rotation=90, fontsize=8)
 
     plt.ylabel("Star Resid RMS in Z (arcsec)")
-    plt.xlabel("Time (Cal Year)")
     plt.suptitle("RMS vs Time")
     plt.xticks(rotation=60)
     ax1.xaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%d'))
