@@ -22,7 +22,5 @@ setup(
     ),
     entry_points=entry_points,
     packages=["vv_trend"],
-    package_data={
-        "vv_trend": ["data/index_template.html", "task_schedule.cfg"]
-    },
+    package_data={"vv_trend": ["data/index_template.html", "task_schedule.cfg"]},
 )
