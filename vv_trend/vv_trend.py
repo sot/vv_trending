@@ -133,7 +133,7 @@ def mission_plots(rms_data):
                 mag_vs_resid=mag_resid_fig)
 
 
-if __name__ == '__main__':
+def main(args=None):
     opt = get_options()
     if not os.path.exists(opt.outdir):
         os.makedirs(opt.outdir)
@@ -160,3 +160,7 @@ if __name__ == '__main__':
         plt.figure(figures[fig].number)
         plt.savefig(os.path.join(opt.outdir,
                                  "{}.png".format(fig)))
+
+
+if __name__ == '__main__':
+    main()
