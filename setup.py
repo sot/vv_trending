@@ -3,7 +3,6 @@ from setuptools import setup
 
 entry_points = {
     "console_scripts": [
-        "vv_trend_copy_index=vv_trend.copy_index:main",
         "vv_trend_update_plots=vv_trend.vv_trend:main",
     ]
 }

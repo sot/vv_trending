@@ -2,6 +2,8 @@
 
 import os
 import argparse
+import shutil
+from pathlib import Path
 import numpy as np
 import matplotlib
 
@@ -148,8 +150,13 @@ def mission_plots(rms_data):
 
 def main(args=None):
     opt = get_options()
-    if not os.path.exists(opt.outdir):
-        os.makedirs(opt.outdir)
+
+    outdir = Path(opt.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    # Copy index to output directory
+    shutil.copyfile(Path(__file__).parent / "data" / "index_template.html",
+                    outdir / "index.html")
 
     rms_data = Table(get_rms_data())
     # Filter in place to only use default data in plots
