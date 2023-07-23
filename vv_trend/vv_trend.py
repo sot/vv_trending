@@ -26,8 +26,7 @@ def get_options():
         description="Update VV/Aspect Solution resid plots"
     )
     parser.add_argument("--outdir", default=".", help="directory for plots")
-    opt = parser.parse_args()
-    return opt
+    return parser
 
 
 def mission_plots(rms_data):
@@ -150,7 +149,7 @@ def mission_plots(rms_data):
 
 
 def main(args=None):
-    opt = get_options()
+    opt = get_options().parse_args(args)
 
     outdir = Path(opt.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
