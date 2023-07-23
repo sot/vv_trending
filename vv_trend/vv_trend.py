@@ -152,8 +152,9 @@ def main(args=None):
     outdir.mkdir(parents=True, exist_ok=True)
 
     # Copy index to output directory
-    shutil.copyfile(Path(__file__).parent / "data" / "index_template.html",
-                    outdir / "index.html")
+    shutil.copyfile(
+        Path(__file__).parent / "data" / "index_template.html", outdir / "index.html"
+    )
 
     rms_data = Table(get_rms_data())
     # Filter in place to only use default data in plots
