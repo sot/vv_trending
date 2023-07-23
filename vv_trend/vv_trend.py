@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import os
 import argparse
 import shutil
 from pathlib import Path
@@ -149,7 +148,6 @@ def main(args=None):
     matplotlib.use("Agg")
     opt = get_options().parse_args(args)
 
-
     outdir = Path(opt.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
 
@@ -176,7 +174,7 @@ def main(args=None):
     figures = mission_plots(rms_data)
     for fig in figures:
         plt.figure(figures[fig].number)
-        plt.savefig(os.path.join(opt.outdir, "{}.png".format(fig)))
+        plt.savefig(outdir / f"{fig}.png")
 
 
 if __name__ == "__main__":
