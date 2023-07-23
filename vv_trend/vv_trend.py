@@ -13,8 +13,9 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.cm as cm
 from astropy.table import Table
+import astropy.units as u
 
-from Chandra.Time import DateTime
+from cxotime import CxoTime
 
 from chandra_aca.dark_model import get_warm_fracs
 from mica.vv import get_rms_data
@@ -35,12 +36,12 @@ def mission_plots(rms_data):
     figsize = (6, 4)
     data = rms_data
     reasonable = (data["dz_rms"] > 0) & (data["dz_rms"] < 1)
-    last_year = data["tstart"] > DateTime(-365).secs
-    since_2015 = data["tstart"] > DateTime("2015:001").secs
+    last_year = data["tstart"] > (CxoTime.now() - 365 * u.days).secs
+    since_2015 = data["tstart"] > CxoTime("2015:001").secs
 
     mag_resid_fig = plt.figure(figsize=figsize)
-    year_2007 = (data["tstart"] < DateTime("2008:001").secs) & (
-        data["tstart"] > DateTime("2007:001").secs
+    year_2007 = (data["tstart"] < CxoTime("2008:001").secs) & (
+        data["tstart"] > CxoTime("2007:001").secs
     )
     cmap_blue = matplotlib.colors.ListedColormap(["white", "blue"])
     cmap_red = matplotlib.colors.ListedColormap(["white", "red"])
@@ -74,10 +75,10 @@ def mission_plots(rms_data):
 
     hist2d_fig = plt.figure(figsize=figsize)
     H, xedges, yedges = np.histogram2d(
-        DateTime(data[reasonable & since_2015]["tstart"]).frac_year,
+        CxoTime(data[reasonable & since_2015]["tstart"]).frac_year,
         data[reasonable & since_2015]["dz_rms"],
         bins=150,
-        range=[[2015, DateTime().frac_year + 0.25], [0, 0.35]],
+        range=[[2015, CxoTime.now().frac_year + 0.25], [0, 0.35]],
     )
     # ax1 = hist2d_fig.add_axes([0.125, 0.12, 0.70, 0.78])
     ax1 = hist2d_fig.add_axes([0.14, 0.14, 0.70, 0.78])
@@ -85,24 +86,24 @@ def mission_plots(rms_data):
     ax1.pcolorfast(xedges, yedges, H.T, cmap=my_cm, norm=norm)
     plt.grid()
     plt.ylim(-0.045, 0.35)
-    plt.vlines(DateTime("2018:292").frac_year, -0.045, 0.35)
+    plt.vlines(CxoTime("2018:292").frac_year, -0.045, 0.35)
     plt.annotate(
         "Mixed IRU",
-        (DateTime("2018:292").frac_year - 0.175, -0.04),
+        (CxoTime("2018:292").frac_year - 0.175, -0.04),
         rotation=90,
         fontsize=8,
     )
-    plt.vlines(DateTime("2020:213").frac_year, -0.045, 0.35)
+    plt.vlines(CxoTime("2020:213").frac_year, -0.045, 0.35)
     plt.annotate(
         "Single IRU",
-        (DateTime("2020:213").frac_year - 0.175, -0.04),
+        (CxoTime("2020:213").frac_year - 0.175, -0.04),
         rotation=90,
         fontsize=8,
     )
-    smode_date = DateTime("2022:294").frac_year
+    smode_date = CxoTime("2022:294").frac_year
     plt.vlines(smode_date, -0.045, 0.35)
     plt.annotate("Safe Mode", (smode_date - 0.175, -0.04), rotation=90, fontsize=8)
-    smode_date = DateTime("2023:044").frac_year
+    smode_date = CxoTime("2023:044").frac_year
     plt.vlines(smode_date, -0.045, 0.35)
     plt.annotate("Safe Mode", (smode_date - 0.175, -0.04), rotation=90, fontsize=8)
 
