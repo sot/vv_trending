@@ -6,9 +6,6 @@ import shutil
 from pathlib import Path
 import numpy as np
 import matplotlib
-
-if __name__ == "__main__":
-    matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.cm as cm
@@ -149,7 +146,9 @@ def mission_plots(rms_data):
 
 
 def main(args=None):
+    matplotlib.use("Agg")
     opt = get_options().parse_args(args)
+
 
     outdir = Path(opt.outdir)
     outdir.mkdir(parents=True, exist_ok=True)
