@@ -31,7 +31,7 @@ def mission_plots(rms_data):
     figsize = (6, 4)
     data = rms_data
     reasonable = (data["dz_rms"] > 0) & (data["dz_rms"] < 1)
-    last_year = data["tstart"] > (CxoTime.now() - 365 * u.days).secs
+    last_year = data["tstart"] > (CxoTime.now() - 365 * u.day).secs
     since_2015 = data["tstart"] > CxoTime("2015:001").secs
 
     mag_resid_fig = plt.figure(figsize=figsize)
